@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { BiSearch, BiSolidGraduation } from "react-icons/bi";
 import { useSession, signOut } from "next-auth/react";
 import { useEffect } from "react";
+import Navbar from "@/components/navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,8 +16,9 @@ export default function Home() {
   }, [status]);
 
   return (
-    <main className={`max-w-screen h-screen`}>
-      <div className="main">
+    <main className={`max-w-screen h-max`}>
+      <Navbar />
+      <div className="main px-5">
         <div className="title mx-auto justify-center text-center w-max mt-52">
           <h1 className="text-5xl lg:text-7xl mx-auto w-max">
             <BiSolidGraduation />
@@ -40,15 +42,22 @@ export default function Home() {
           )}
 
           <h1 className="text-base lg:text-xl mt-10">Cari buku</h1>
-          <div className="flex justify-center">
-            <input
-              className="outline-none bg-gray-800 p-2 rounded-lg px-4 mt-2 text-base lg:text-lg text-left"
-              placeholder="Cari buku..."
-            />
-            <button className="ml-4 bg-blue-950 p-2 px-4 mt-2 text-base lg:text-lg rounded-lg">
-              <BiSearch />
-            </button>
-          </div>
+          <form action={"/search"} method="get">
+            <div className="flex justify-center">
+              <input
+                className="outline-none bg-gray-800 p-2 rounded-lg px-4 mt-2 text-base lg:text-lg text-left"
+                placeholder="Cari buku..."
+                id="search"
+                name="search"
+              />
+              <button
+                className="ml-4 bg-blue-950 p-2 px-4 mt-2 text-base lg:text-lg rounded-lg"
+                type="submit"
+              >
+                <BiSearch />
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </main>
