@@ -2,6 +2,7 @@ import Navbar from "@/components/navbar";
 import Link from "next/link";
 import { NextRouter, useRouter } from "next/router";
 import { ChangeEvent, useEffect, useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
 import { BiSearch } from "react-icons/bi";
 import LoadingIcons from "react-loading-icons";
 
@@ -11,7 +12,47 @@ const SearchPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [searchInput, setSearchInput] = useState<string>("");
 
-  const { search }: any = router.query;
+  const { search, page }: any = router.query;
+
+  const nextPage = () => {
+    const pageInt = parseInt(page);
+    const nextpage = Math.floor(pageInt + 1).toString();
+    if (!page) {
+      return (window.location.href =
+        `${window.location.origin}/search?` +
+        new URLSearchParams({ search: search, page: "2" }).toString());
+    }
+
+    const maxPage = Math.floor(page * 100);
+    if (maxPage > books.num_found) {
+      toast.error(`Hanya ada sampai halaman ke ${page}`, {
+        position: "top-right",
+      });
+      return "";
+    }
+
+    return (window.location.href =
+      `${window.location.origin}/search?` +
+      new URLSearchParams({ search: search, page: nextpage }).toString());
+  };
+
+  const previousPage = () => {
+    if (!page || parseInt(page) == 1) {
+      toast.error("Kamu sedang berada di halaman paling awal!", {
+        position: "top-right",
+      });
+      return "";
+    } else if (parseInt(page) == 2) {
+      return (window.location.href =
+        `${window.location.origin}/search?` +
+        new URLSearchParams({ search: search }).toString());
+    }
+    const pageInt = parseInt(page);
+    const prevpage = Math.floor(pageInt - 1).toString();
+    return (window.location.href =
+      `${window.location.origin}/search?` +
+      new URLSearchParams({ search: search, page: prevpage }).toString());
+  };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchInput(e.target.value);
@@ -23,34 +64,35 @@ const SearchPage = () => {
     } else {
       setSearchInput(search);
       const getBooks = async () => {
-        console.log(search);
-        console.log(
+        let urlParam =
           `https://openlibrary.org/search.json?` +
-            new URLSearchParams({ q: search }).toString()
-        );
+          new URLSearchParams({ title: search }).toString();
+        if (!page) {
+          urlParam = urlParam;
+        } else {
+          urlParam =
+            `https://openlibrary.org/search.json?` +
+            new URLSearchParams({ title: search, page: page }).toString();
+        }
         setLoading(true);
         try {
-          fetch(
-            `https://openlibrary.org/search.json?` +
-              new URLSearchParams({ q: search }).toString()
-          ).then(async (res) => {
+          fetch(urlParam).then(async (res) => {
             const data = await res.json();
-            console.log(data.docs.slice(0, 9));
             setBooks(data);
             setLoading(false);
           });
         } catch (error) {
-          console.log(error);
           setBooks("error");
           setLoading(false);
         }
       };
       getBooks();
     }
-  }, [search, router.isReady]);
+  }, [search, router.isReady, page]);
 
   return (
     <>
+      <Toaster />
       <Navbar />
       <main className="max-w-screen h-max">
         <div className="main px-5 my-52">
@@ -94,7 +136,7 @@ const SearchPage = () => {
                 {books != "error" && books != null && books.docs.length > 0 ? (
                   <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 justify-center gap-5 text-center">
-                      {books.docs.slice(11, 21).map((doc: any) => {
+                      {books.docs.map((doc: any) => {
                         return (
                           <div key={doc.key} className="p-5 bg-neutral-800">
                             <img
@@ -111,12 +153,19 @@ const SearchPage = () => {
                             </h1>
                             <h1>
                               Author(s) :{" "}
-                              {doc.author_name.map((name: any, index: any) => {
-                                if (doc.author_name.length === index + 1) {
-                                  return `${name}.`;
-                                }
-                                return `${name}, `;
-                              })}
+                              {doc.author_name != null || undefined
+                                ? doc.author_name.map(
+                                    (name: any, index: any) => {
+                                      if (
+                                        doc.author_name.length ===
+                                        index + 1
+                                      ) {
+                                        return `${name}.`;
+                                      }
+                                      return `${name}, `;
+                                    }
+                                  )
+                                : "Tidak ada author"}
                             </h1>
                             <Link href={""}>
                               <button className="btn-primary mt-5">
@@ -127,13 +176,28 @@ const SearchPage = () => {
                         );
                       })}
                     </div>
+                    <div className="flex mx-auto mt-12 w-max gap-5">
+                      <button onClick={previousPage} className="btn-primary">
+                        &lt;
+                      </button>
+                      <h1 className="text-3xl bg-gray-800 w-max p-5 rounded-md">
+                        {page ? page : "1"}
+                      </h1>
+                      <button onClick={nextPage} className="btn-primary">
+                        &gt;
+                      </button>
+                    </div>
+                  </>
+                ) : books == "error" ? (
+                  <>
+                    <h1>Terjadi suatu kesalahan! Harap hubungi admin.</h1>
                   </>
                 ) : null}
                 {loading ? (
                   <>
                     <div className="mx-auto w-full text-center">
                       <LoadingIcons.Puff className="mx-auto scale-[2]" />
-                      <h1 className="mt-5 text-xl">Sedang mencari... </h1>
+                      <h1 className="mt-5 text-xl">Mohon tunggu...</h1>
                     </div>
                   </>
                 ) : null}
