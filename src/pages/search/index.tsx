@@ -72,7 +72,10 @@ const SearchPage = () => {
         } else {
           urlParam =
             `https://openlibrary.org/search.json?` +
-            new URLSearchParams({ title: search, page: page }).toString();
+            new URLSearchParams({
+              title: search,
+              page: page,
+            }).toString();
         }
         setLoading(true);
         try {
@@ -80,6 +83,7 @@ const SearchPage = () => {
             const data = await res.json();
             setBooks(data);
             setLoading(false);
+            console.log(data);
           });
         } catch (error) {
           setBooks("error");
@@ -135,6 +139,17 @@ const SearchPage = () => {
               <>
                 {books != "error" && books != null && books.docs.length > 0 ? (
                   <>
+                    <div className="flex mx-auto mb-12 w-max gap-5">
+                      <button onClick={previousPage} className="btn-primary">
+                        &lt;
+                      </button>
+                      <h1 className="text-3xl bg-gray-800 w-max p-5 rounded-md">
+                        {page ? page : "1"}
+                      </h1>
+                      <button onClick={nextPage} className="btn-primary">
+                        &gt;
+                      </button>
+                    </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 justify-center gap-5 text-center">
                       {books.docs.map((doc: any) => {
                         return (
@@ -143,8 +158,8 @@ const SearchPage = () => {
                               alt={doc.title}
                               className="mx-auto w-[200px] h-[300px]"
                               src={
-                                doc.isbn
-                                  ? `http://covers.openlibrary.org/b/isbn/${doc.isbn?.[0]}-M.jpg`
+                                doc.cover_i
+                                  ? `http://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`
                                   : "https://placehold.co/200x300"
                               }
                             />
@@ -165,9 +180,9 @@ const SearchPage = () => {
                                       return `${name}, `;
                                     }
                                   )
-                                : "Tidak ada author"}
+                                : "Author tidak diketahui"}
                             </h1>
-                            <Link href={""}>
+                            <Link href={`/book${doc.key}`}>
                               <button className="btn-primary mt-5">
                                 Lihat buku
                               </button>

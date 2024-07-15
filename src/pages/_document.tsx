@@ -10,7 +10,7 @@ export default function Document() {
           content="Website tempat kamu mencari buku kesukaanmu!"
         />
       </Head>
-      <body className="dark:bg-gray-950 bg-white text-neutral-950 dark:text-neutral-200">
+      <body className="dark:bg-zinc-950 bg-white text-neutral-950 dark:text-neutral-200">
         <Main />
         <NextScript />
       </body>

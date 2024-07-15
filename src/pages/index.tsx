@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { Inter } from "next/font/google";
-import { BiSearch, BiSolidGraduation } from "react-icons/bi";
+import { BiSearch, BiSolidBook, BiSolidGraduation } from "react-icons/bi";
 import { useSession, signOut } from "next-auth/react";
 import { useEffect } from "react";
 import Navbar from "@/components/navbar";
@@ -21,7 +21,7 @@ export default function Home() {
       <div className="main px-5">
         <div className="title mx-auto justify-center text-center w-max mt-52">
           <h1 className="text-5xl lg:text-7xl mx-auto w-max">
-            <BiSolidGraduation />
+            <BiSolidBook />
           </h1>
           <h1 className="text-5xl lg:text-7xl font-bold">Literasi Pintar</h1>
           <h1 className="text-lg lg:text-2xl font-medium mt-5">
@@ -45,7 +45,7 @@ export default function Home() {
           <form action={"/search"} method="get">
             <div className="flex justify-center">
               <input
-                className="outline-none bg-gray-800 p-2 rounded-lg px-4 mt-2 text-base lg:text-lg text-left"
+                className="outline-none bg-gray-800 p-2 rounded-lg px-4 mt-2 text-base lg:text-lg text-left focus:ring-2 focus:ring-blue-600"
                 placeholder="Cari buku..."
                 id="search"
                 name="search"
